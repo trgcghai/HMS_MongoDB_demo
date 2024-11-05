@@ -34,13 +34,13 @@ const TablePatient = () => {
         <Table>
             <TableHeader>
                 <TableRow>
-                    <TableHead className="text-lg font-bold w-[100px]">First Name</TableHead>
-                    <TableHead className="text-lg font-bold w-[100px]">Last Name</TableHead>
-                    <TableHead className="text-lg font-bold w-[100px]">Date of birth</TableHead>
-                    <TableHead className="text-lg font-bold w-[100px]">Phone</TableHead>
-                    <TableHead className="text-lg font-bold w-[100px]">Gender</TableHead>
-                    <TableHead className="text-lg font-bold w-[100px]">Address</TableHead>
-                    <TableHead className="text-lg font-bold w-[100px]">Profiles</TableHead>
+                    <TableHead className="text-lg font-bold w-[100px]">Họ</TableHead>
+                    <TableHead className="text-lg font-bold w-[100px]">Tên</TableHead>
+                    <TableHead className="text-lg font-bold w-[100px]">Ngày sinh</TableHead>
+                    <TableHead className="text-lg font-bold w-[100px]">Số điện thoại</TableHead>
+                    <TableHead className="text-lg font-bold w-[100px]">Giới tính</TableHead>
+                    <TableHead className="text-lg font-bold w-[100px]">Địa chỉ</TableHead>
+                    <TableHead className="text-lg font-bold w-[100px]">Thông tin hồ sơ</TableHead>
                 </TableRow>
             </TableHeader>
             <TableBody>

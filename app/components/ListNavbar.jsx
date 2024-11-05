@@ -13,11 +13,8 @@ const ListNavbar = () => {
                 >
                     <Link href={'/'}>Bệnh nhân</Link>
                 </li>
-                <li className={`w-full py-3 cursor-pointer hover:bg-white hover:text-blue-400 text-center`}>
-                    <Link href={'/doctor'} >Bác sĩ</Link>
-                </li>
-                <li className={`w-full py-3 cursor-pointer hover:bg-white hover:text-blue-400 text-center`}>
-                    <Link href={'/nurse'}>Y tá</Link>
+                <li className={`w-full py-3 cursor-pointer hover:bg-white hover:text-blue-400 text-center ${path.includes('appointment') ? 'bg-white text-blue-400' : ''}`}>
+                    <Link href={'/appointment'} >Lịch khám</Link>
                 </li>
                 <li className={`w-full py-3 cursor-pointer hover:bg-white hover:text-blue-400 text-center`}>
                     <Link href={'/prescription'}>Đơn thuốc</Link>

@@ -1,38 +1,37 @@
 'use client'
 import React, { createContext, useContext, useState } from 'react'
-import { patients } from '../data'
+import { patients, doctor, appointment } from '../data'
 
 const AppContext = createContext()
 
 const Context = ({ children }) => {
     const [data, setData] = useState(patients)
-    const [phoneInput, setPhoneInput] = useState("")
+    const [doctors, setDoctors] = useState(doctor)
+    const [appointments, setAppointments] = useState(appointment)
     const [selectPatientID, setSelectedPatientID] = useState('')
     const [selectedProfileID, setSelectedProfileID] = useState('')
+    const [selectedSearchPatientId, setSelectedSearchPatientId] = useState('')
+    const [selectedSearchDoctorId, setSelectedSearchDoctorId] = useState('')
 
-    const handleSearch = () => {
-        if (!phoneInput.match(/[0-9]{10}/)) {
-            alert("Phone invalid")
-            return
-        }
-        const newData = data.filter((patient) => patient.phone == phoneInput)
-        setData(newData)
-        setPhoneInput('')
+    const resetPatient = () => {
+        setData(patients)
     }
 
-    const handleCancel = () => {
-        setData(patients)
-        setPhoneInput('')
+    const resetAppointment = () => {
+        setAppointments(appointment)
     }
 
     return (
         <AppContext.Provider value={{
             data, setData,
-            phoneInput, setPhoneInput,
+            doctors, setDoctors,
             selectPatientID, setSelectedPatientID,
             selectedProfileID, setSelectedProfileID,
-            handleSearch,
-            handleCancel,
+            selectedSearchPatientId, setSelectedSearchPatientId,
+            selectedSearchDoctorId, setSelectedSearchDoctorId,
+            appointments, setAppointments,
+            resetPatient,
+            resetAppointment
         }}>
             {children}
         </AppContext.Provider >

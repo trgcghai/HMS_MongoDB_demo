@@ -2,11 +2,23 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import React from 'react'
+import React, { useState } from 'react'
 import { useAppContext } from '../context/Context'
 
 const FormSearchPatient = () => {
-    const { phoneInput, setPhoneInput, handleSearch, handleCancel } = useAppContext()
+    const { data, setData, resetPatient } = useAppContext()
+    const [phoneInput, setPhoneInput] = useState("")
+
+    const handleSearch = () => {
+        if (!phoneInput.match(/[0-9]{10}/)) {
+            alert("Phone invalid")
+            return
+        }
+        const newData = data.filter((patient) => patient.phone == phoneInput)
+        setData(newData)
+        setPhoneInput('')
+    }
+
     return (
         <div className="flex items-center justify-start gap-2 ">
             <Input placeholder="Nhập sđt bệnh nhân" className="w-[300px] text-slate-500" value={phoneInput} onChange={(e) => setPhoneInput(e.target.value)} />
@@ -14,7 +26,7 @@ const FormSearchPatient = () => {
                 <FontAwesomeIcon icon={faMagnifyingGlass} />
                 Tìm kiếm
             </Button>
-            <Button type="button" className="bg-red-400 w-[120px] hover:bg-red-500" onClick={handleCancel}>
+            <Button type="button" className="bg-red-400 w-[120px] hover:bg-red-500" onClick={resetPatient}>
                 Hủy
             </Button>
         </div>
