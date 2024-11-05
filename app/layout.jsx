@@ -17,9 +17,7 @@ export default function RootLayout({ children }) {
         <Context>
           <Header></Header>
           <ListNavbar></ListNavbar>
-          <div className="text-lg text-blue-500 ml-[200px] mt-8 px-4">
-            {children}
-          </div>
+          {children}
         </Context>
       </body>
     </html>
