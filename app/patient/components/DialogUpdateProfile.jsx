@@ -16,43 +16,53 @@ import { Button } from '@/components/ui/button';
 import { useAppContext } from '@/app/context/Context';
 import { useParams } from 'next/navigation';
 
-const DialogUpdateProfile = () => {
-    const { data, setData, selectPatientID, selectedProfileID } = useAppContext()
-    const [profile, setProfile] = useState({ profile_id: '', treatment: '', disease: [], date: '' })
+const DialogUpdateProfile = ({ profile }) => {
+    const params = useParams()
+    const { patients, setSubProfiles, selectedProfileID } = useAppContext()
+    const [patientFetch, setPatientFetch] = useState()
+    const [inputTreatment, setInputTreatment] = useState('')
+    const [inputDisease, setInputDisease] = useState('')
 
     useEffect(() => {
-        const patient = data.find((patient) => patient._id == selectPatientID)
-        const patientProfiles = patient.Profiles.find((profile) => profile.profile_id == selectedProfileID)
-        setProfile({
-            ...patientProfiles
+        const patient = patients.find((patient) => patient._id == params.id)
+
+        setPatientFetch({
+            ...patient
         })
-    }, [data, selectPatientID, selectedProfileID])
+        setInputTreatment(profile.treatment)
+        setInputDisease(profile.disease.join(', '))
+
+    }, [patients, params])
+
+    const fetchUpdateProfile = async () => {
+        const updateProfile = {
+            _id: profile.profile_id,
+            treatment: inputTreatment,
+            disease: inputDisease.split(', ')
+        }
+
+        console.log('>>> check updateProfile >>>', {updateProfile})
+
+        const respone = await fetch('http://localhost:3000/api/profiles/' + profile.profile_id, {
+            method: 'POST',
+            headers: {
+                'content-type': 'application/json',
+            },
+            body: JSON.stringify({
+                patient: patientFetch,
+                updateProfile
+            })
+        })
+        const { updateSuccess, subProfiles } = await respone.json()
+        if (updateSuccess) {
+            setSubProfiles(subProfiles)
+        }
+    }
 
     const handleUpdateProfile = () => {
-        let patient = data.find((patient) => patient._id == selectPatientID)
-        let patientProfile = patient.Profiles.find((profile) => profile.profile_id == selectedProfileID)
-        patientProfile = {
-            ...patientProfile,
-            ...profile,
-            disease: profile.disease.split(',')
-        }
-        patient = {
-            ...patient,
-            Profiles: patient.Profiles.map((profile) => {
-                if (profile.profile_id == selectedProfileID) {
-                    return { ...patientProfile }
-                } else {
-                    return { ...profile }
-                }
-            })
-        }
-        setData(data.map((pat) => {
-            if (pat._id == selectPatientID) {
-                return { ...patient }
-            } else {
-                return { ...pat }
-            }
-        }))
+        if (profile.treatment.trim().length == 0 || inputDisease.trim().length == 0) return
+
+        fetchUpdateProfile()
     }
 
     return (
@@ -67,11 +77,11 @@ const DialogUpdateProfile = () => {
                 <div>
                     <div className="mb-4">
                         <Label htmlFor="treatment">Phương pháp điều trị</Label>
-                        <Input id='treatment' value={profile.treatment} onChange={(e) => setProfile({ ...profile, treatment: e.target.value })} />
+                        <Input id='treatment' value={inputTreatment} onChange={(e) => setInputTreatment(e.target.value)} />
                     </div>
                     <div className="mb-4">
                         <Label htmlFor="disease">Các bệnh</Label>
-                        <Input id='disease' value={profile.disease} onChange={(e) => setProfile({ ...profile, disease: e.target.value })} />
+                        <Input id='disease' value={inputDisease} onChange={(e) => setInputDisease(e.target.value)} />
                     </div>
                 </div>
                 <DialogFooter>

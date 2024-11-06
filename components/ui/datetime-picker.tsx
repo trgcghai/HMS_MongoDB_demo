@@ -50,8 +50,84 @@ import { Button, buttonVariants } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
+export type CalendarProps = Omit<React.ComponentProps<typeof DayPicker>, 'mode'>;
+
 const AM_VALUE = 0;
 const PM_VALUE = 1;
+
+export type DateTimePickerProps = {
+  /**
+   * The datetime value to display and control.
+   */
+  value: Date | undefined;
+  /**
+   * Callback function to handle datetime changes.
+   */
+  onChange: (date: Date | undefined) => void;
+  /**
+   * The minimum datetime value allowed.
+   * @default undefined
+   */
+  min?: Date;
+  /**
+   * The maximum datetime value allowed.
+   */
+  max?: Date;
+  /**
+   * The timezone to display the datetime in, based on the date-fns.
+   * For a complete list of valid time zone identifiers, refer to:
+   * https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+   * @default undefined
+   */
+  timezone?: string;
+  /**
+   * Whether the datetime picker is disabled.
+   * @default false
+   */
+  disabled?: boolean;
+  /**
+   * Whether to show the time picker.
+   * @default false
+   */
+  hideTime?: boolean;
+  /**
+   * Whether to use 12-hour format.
+   * @default false
+   */
+  use12HourFormat?: boolean;
+  /**
+   * Whether to show the clear button.
+   * @default false
+   */
+  clearable?: boolean;
+  /**
+   * Custom class names for the component.
+   */
+  classNames?: {
+    /**
+     * Custom class names for the trigger (the button that opens the picker).
+     */
+    trigger?: string;
+  };
+  timePicker?: {
+    hour?: boolean;
+    minute?: boolean;
+    second?: boolean;
+  };
+  /**
+   * Custom render function for the trigger.
+   */
+  renderTrigger?: (props: DateTimeRenderTriggerProps) => React.ReactNode;
+};
+
+export type DateTimeRenderTriggerProps = {
+  value: Date | undefined;
+  open: boolean;
+  timezone?: string;
+  disabled?: boolean;
+  use12HourFormat?: boolean;
+  setOpen: (open: boolean) => void;
+};
 
 export function DateTimePicker({
   value,
@@ -67,13 +143,13 @@ export function DateTimePicker({
   classNames,
   timePicker,
   ...props
-}) {
+}: DateTimePickerProps & CalendarProps) {
   const [open, setOpen] = useState(false);
-  const [monthYearPicker, setMonthYearPicker] = useState(false);
+  const [monthYearPicker, setMonthYearPicker] = useState<'month' | 'year' | false>(false);
   const initDate = useMemo(() => new TZDate(value || new Date(), timezone), [value, timezone]);
 
-  const [month, setMonth] = useState(initDate);
-  const [date, setDate] = useState(initDate);
+  const [month, setMonth] = useState<Date>(initDate);
+  const [date, setDate] = useState<Date>(initDate);
 
   const endMonth = useMemo(() => {
     return setYear(month, getYear(month) + 1);
@@ -82,7 +158,7 @@ export function DateTimePicker({
   const maxDate = useMemo(() => (max ? new TZDate(max, timezone) : undefined), [max, timezone]);
 
   const onDayChanged = useCallback(
-    (d) => {
+    (d: Date) => {
       d.setHours(date.getHours(), date.getMinutes(), date.getSeconds());
       if (min && d < min) {
         d.setHours(min.getHours(), min.getMinutes(), min.getSeconds());
@@ -100,7 +176,7 @@ export function DateTimePicker({
   }, [date, onChange]);
 
   const onMonthYearChanged = useCallback(
-    (d, mode) => {
+    (d: Date, mode: 'month' | 'year') => {
       setMonth(d);
       if (mode === 'year') {
         setMonthYearPicker('month');
@@ -211,7 +287,7 @@ export function DateTimePicker({
             onSelect={(d) => d && onDayChanged(d)}
             month={month}
             endMonth={endMonth}
-            disabled={[max ? { after: max } : null, min ? { before: min } : null].filter(Boolean)}
+            disabled={[max ? { after: max } : null, min ? { before: min } : null].filter(Boolean) as Matcher[]}
             onMonthChange={setMonth}
             classNames={{
               dropdowns: 'flex w-full gap-2',
@@ -247,7 +323,7 @@ export function DateTimePicker({
           ></div>
           <MonthYearPicker
             value={month}
-            mode={monthYearPicker}
+            mode={monthYearPicker as any}
             onChange={onMonthYearChanged}
             minDate={minDate}
             maxDate={maxDate}
@@ -289,10 +365,17 @@ function MonthYearPicker({
   mode = 'month',
   onChange,
   className,
+}: {
+  value: Date;
+  mode: 'month' | 'year';
+  minDate?: Date;
+  maxDate?: Date;
+  onChange: (value: Date, mode: 'month' | 'year') => void;
+  className?: string;
 }) {
-  const yearRef = useRef < HTMLDivElement > (null);
+  const yearRef = useRef<HTMLDivElement>(null);
   const years = useMemo(() => {
-    const years = [];
+    const years: TimeOption[] = [];
     for (let i = 1912; i < 2100; i++) {
       let disabled = false;
       const startY = startOfYear(setYear(value, i));
@@ -304,7 +387,7 @@ function MonthYearPicker({
     return years;
   }, [value]);
   const months = useMemo(() => {
-    const months = [];
+    const months: TimeOption[] = [];
     for (let i = 0; i < 12; i++) {
       let disabled = false;
       const startM = startOfMonth(setMonthFns(value, i));
@@ -317,7 +400,7 @@ function MonthYearPicker({
   }, [value]);
 
   const onYearChange = useCallback(
-    (v) => {
+    (v: TimeOption) => {
       let newDate = setYear(value, v.value);
       if (minDate && newDate < minDate) {
         newDate = setMonthFns(newDate, getMonth(minDate));
@@ -375,6 +458,12 @@ function MonthYearPicker({
   );
 }
 
+interface TimeOption {
+  value: number;
+  label: string;
+  disabled: boolean;
+}
+
 function TimePicker({
   value,
   onChange,
@@ -382,6 +471,13 @@ function TimePicker({
   min,
   max,
   timePicker,
+}: {
+  use12HourFormat?: boolean;
+  value: Date;
+  onChange: (date: Date) => void;
+  min?: Date;
+  max?: Date;
+  timePicker?: DateTimePickerProps['timePicker'];
 }) {
   // hours24h = HH
   // hours12h = hh
@@ -405,7 +501,7 @@ function TimePicker({
     return use12HourFormat ? (hour % 12) + ampm * 12 : hour;
   }, [value, use12HourFormat, ampm]);
 
-  const hours = useMemo(
+  const hours: TimeOption[] = useMemo(
     () =>
       Array.from({ length: use12HourFormat ? 12 : 24 }, (_, i) => {
         let disabled = false;
@@ -423,7 +519,7 @@ function TimePicker({
       }),
     [value, min, max, use12HourFormat, ampm]
   );
-  const minutes = useMemo(() => {
+  const minutes: TimeOption[] = useMemo(() => {
     const anchorDate = setHours(value, _hourIn24h);
     return Array.from({ length: 60 }, (_, i) => {
       let disabled = false;
@@ -439,7 +535,7 @@ function TimePicker({
       };
     });
   }, [value, min, max, _hourIn24h]);
-  const seconds = useMemo(() => {
+  const seconds: TimeOption[] = useMemo(() => {
     const anchorDate = setMilliseconds(setMinutes(setHours(value, _hourIn24h), minute), 0);
     const _min = min ? setMilliseconds(min, 0) : undefined;
     const _max = max ? setMilliseconds(max, 0) : undefined;
@@ -473,9 +569,9 @@ function TimePicker({
 
   const [open, setOpen] = useState(false);
 
-  const hourRef = useRef < HTMLDivElement > (null);
-  const minuteRef = useRef < HTMLDivElement > (null);
-  const secondRef = useRef < HTMLDivElement > (null);
+  const hourRef = useRef<HTMLDivElement>(null);
+  const minuteRef = useRef<HTMLDivElement>(null);
+  const secondRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -490,7 +586,7 @@ function TimePicker({
   }, [open]);
 
   const onHourChange = useCallback(
-    (v) => {
+    (v: TimeOption) => {
       if (min) {
         let newTime = buildTime({ use12HourFormat, value, formatStr, hour: v.value, minute, second, ampm });
         if (newTime < min) {
@@ -511,7 +607,7 @@ function TimePicker({
   );
 
   const onMinuteChange = useCallback(
-    (v) => {
+    (v: TimeOption) => {
       if (min) {
         let newTime = buildTime({ use12HourFormat, value, formatStr, hour: v.value, minute, second, ampm });
         if (newTime < min) {
@@ -530,7 +626,7 @@ function TimePicker({
   );
 
   const onAmpmChange = useCallback(
-    (v) => {
+    (v: TimeOption) => {
       if (min) {
         let newTime = buildTime({ use12HourFormat, value, formatStr, hour, minute, second, ampm: v.value });
         if (newTime < min) {
@@ -557,7 +653,7 @@ function TimePicker({
   const display = useMemo(() => {
     let arr = [];
     for (const element of ['hour', 'minute', 'second']) {
-      if (!timePicker || timePicker[element]) {
+      if (!timePicker || timePicker[element as keyof typeof timePicker]) {
         if (element === 'hour') {
           arr.push(use12HourFormat ? 'hh' : 'HH');
         } else {
@@ -660,6 +756,12 @@ const TimeItem = ({
   onSelect,
   className,
   disabled,
+}: {
+  option: TimeOption;
+  selected: boolean;
+  onSelect: (option: TimeOption) => void;
+  className?: string;
+  disabled?: boolean;
 }) => {
   return (
     <Button
@@ -674,9 +776,19 @@ const TimeItem = ({
   );
 };
 
-function buildTime(options) {
+interface BuildTimeOptions {
+  use12HourFormat?: boolean;
+  value: Date;
+  formatStr: string;
+  hour: number;
+  minute: number;
+  second: number;
+  ampm: number;
+}
+
+function buildTime(options: BuildTimeOptions) {
   const { use12HourFormat, value, formatStr, hour, minute, second, ampm } = options;
-  let date;
+  let date: Date;
   if (use12HourFormat) {
     const dateStrRaw = format(value, formatStr);
     // yyyy-MM-dd hh:mm:ss.SSS a zzzz

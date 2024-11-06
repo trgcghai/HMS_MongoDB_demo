@@ -6,7 +6,7 @@ import React, { useState } from 'react'
 import { useAppContext } from '../context/Context'
 
 const FormSearchPatient = () => {
-    const { data, setData, resetPatient } = useAppContext()
+    const { patients, setPatients } = useAppContext()
     const [phoneInput, setPhoneInput] = useState("")
 
     const handleSearch = () => {
@@ -14,9 +14,21 @@ const FormSearchPatient = () => {
             alert("Phone invalid")
             return
         }
-        const newData = data.filter((patient) => patient.phone == phoneInput)
-        setData(newData)
+        const newData = patients.filter((patient) => patient.phone.includes(phoneInput))
+        console.log(newData)
+        setPatients(newData)
         setPhoneInput('')
+    }
+
+    const fetchPatient = async () => {
+        const response = await fetch('http://localhost:3000/api/patients', {
+            method: 'GET',
+            headers: {
+                'content-type': 'application/json'
+            }
+        })
+        const res = await response.json()
+        setPatients(res.patients)
     }
 
     return (
@@ -26,7 +38,7 @@ const FormSearchPatient = () => {
                 <FontAwesomeIcon icon={faMagnifyingGlass} />
                 Tìm kiếm
             </Button>
-            <Button type="button" className="bg-red-400 w-[120px] hover:bg-red-500" onClick={resetPatient}>
+            <Button type="button" className="bg-red-400 w-[120px] hover:bg-red-500" onClick={fetchPatient}>
                 Hủy
             </Button>
         </div>

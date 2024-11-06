@@ -18,8 +18,22 @@ import { useAppContext } from '../context/Context';
 import { DateTimePicker } from '@/components/ui/datetime-picker';
 
 const DialogPatient = () => {
-    const { data, setData } = useAppContext()
+    const { patients, setPatients } = useAppContext()
     const [patient, setPatient] = useState({ _id: Math.floor(Math.random() * 1000000 + 1).toString(), firstName: '', lastName: '', dob: '', address: '', gender: '', phone: '', Profiles: [] })
+
+    const fetchCreateNewPatient = async () => {
+        const respone = await fetch('http://localhost:3000/api/patients', {
+            method: "POST",
+            headers: {
+                'content-type': 'application/json'
+            },
+            body: JSON.stringify({ patient })
+        })
+        const res = await respone.json()
+        if (res.createSuccess) {
+            setPatients([...patients, patient])
+        }
+    }
 
     const handleAddNewPatient = () => {
         if (patient.firstName.trim().length == 0 || patient.lastName.trim().length == 0
@@ -27,10 +41,12 @@ const DialogPatient = () => {
 
         if (!patient.phone.match(/[0-9]{10}/)) return
 
-        setPatient({
-            ...patient,
-        })
-        setData([...data, patient])
+        // setPatient({
+        //     ...patient,
+        // })
+        // setData([...data, patient])
+
+        fetchCreateNewPatient()
 
         setPatient({
             ...patient,

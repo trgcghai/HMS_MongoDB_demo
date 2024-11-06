@@ -1,5 +1,5 @@
 'use client'
-import React from 'react'
+import React, { useEffect } from 'react'
 import {
     Table,
     TableBody,
@@ -15,18 +15,24 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 
 const TablePatient = () => {
-    const { data, setSelectedPatientID } = useAppContext()
-
+    const { patients, setPatients, formatDateString } = useAppContext()
     const router = useRouter()
 
-    function formatDateString(dateString) {
-        const date = new Date(dateString).toLocaleDateString('en-CA')
-        const [year, month, day] = date.split('-');
-        return `${day}/${month}/${year}`;
-    }
+    useEffect(() => {
+        const fetchPatient = async () => {
+            const response = await fetch('http://localhost:3000/api/patients', {
+                method: 'GET',
+                headers: {
+                    'content-type': 'application/json'
+                }
+            })
+            const res = await response.json()
+            setPatients(res.patients)
+        }
+        fetchPatient()
+    }, [])
 
     const handleClick = (id) => {
-        setSelectedPatientID(id)
         router.push('/patient/' + id)
     }
 
@@ -44,7 +50,7 @@ const TablePatient = () => {
                 </TableRow>
             </TableHeader>
             <TableBody>
-                {data.map((patient) => {
+                {patients && patients.map((patient) => {
                     return <TableRow key={patient._id}>
                         <TableCell className="text-lg text-slate-600">{patient.firstName}</TableCell>
                         <TableCell className="text-lg text-slate-600">{patient.lastName}</TableCell>

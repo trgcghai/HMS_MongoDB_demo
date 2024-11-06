@@ -17,30 +17,36 @@ import { useAppContext } from '@/app/context/Context';
 import { useParams } from 'next/navigation';
 
 const DialogProfile = () => {
-    const { data, setData } = useAppContext()
+    const { patients, setSubProfiles } = useAppContext()
     const { id } = useParams()
-    const [profile, setProfile] = useState({ profile_id: '', treatment: '', disease: '', date: '' })
+    const [profile, setProfile] = useState({ treatment: '', disease: '' })
+
+    const fetchCreateNewProfile = async () => {
+        const respone = await fetch('http://localhost:3000/api/profiles', {
+            method: 'POST',
+            headers: {
+                'content-type': 'application/json'
+            },
+            body: JSON.stringify({
+                profile: {
+                    treatment: profile.treatment,
+                    disease: profile.disease.split(',')
+                },
+                patient: patients.find((patient) => patient._id == id)
+            })
+        })
+        const {createSuccess, subProfiles} = await respone.json()
+        if (createSuccess) {
+            setSubProfiles(subProfiles)
+        }
+    }
 
     const handleAddProfile = () => {
-        const chosedPatient = data.find((patient) => patient._id == id)
         if (profile.treatment.trim().length == 0 || profile.disease.trim().length == 0) return
-        chosedPatient.Profiles.push({
-            ...profile,
-            profile_id: Math.floor(Math.random() * 1000000 + 1).toString(),
-            date: new Date().toLocaleDateString('en-CA'),
-            disease: profile.disease.split(",")
-        })
+
         setProfile({ treatment: '', disease: '' })
-        setData(data.map((patient) => {
-            if (patient._id == id) {
-                return {
-                    ...patient,
-                    Profiles: chosedPatient.Profiles
-                }
-            } else {
-                return patient
-            }
-        }))
+
+        fetchCreateNewProfile()
     }
 
     return (

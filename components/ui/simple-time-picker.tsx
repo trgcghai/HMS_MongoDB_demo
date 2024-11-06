@@ -26,6 +26,12 @@ import {
   setMilliseconds,
 } from 'date-fns';
 
+interface SimpleTimeOption {
+  value: any;
+  label: string;
+  disabled?: boolean;
+}
+
 const AM_VALUE = 0;
 const PM_VALUE = 1;
 
@@ -36,6 +42,14 @@ export function SimpleTimePicker({
   min,
   max,
   disabled,
+}: {
+  use12HourFormat?: boolean;
+  value: Date;
+  onChange: (date: Date) => void;
+  min?: Date;
+  max?: Date;
+  disabled?: boolean;
+  className?: string;
 }) {
   // hours24h = HH
   // hours12h = hh
@@ -56,7 +70,7 @@ export function SimpleTimePicker({
     return use12HourFormat ? (hour % 12) + ampm * 12 : hour;
   }, [hour, use12HourFormat, ampm]);
 
-  const hours = useMemo(
+  const hours: SimpleTimeOption[] = useMemo(
     () =>
       Array.from({ length: use12HourFormat ? 12 : 24 }, (_, i) => {
         let disabled = false;
@@ -74,7 +88,7 @@ export function SimpleTimePicker({
       }),
     [value, min, max, use12HourFormat, ampm]
   );
-  const minutes = useMemo(() => {
+  const minutes: SimpleTimeOption[] = useMemo(() => {
     const anchorDate = setHours(value, _hourIn24h);
     return Array.from({ length: 60 }, (_, i) => {
       let disabled = false;
@@ -90,7 +104,7 @@ export function SimpleTimePicker({
       };
     });
   }, [value, min, max, _hourIn24h]);
-  const seconds = useMemo(() => {
+  const seconds: SimpleTimeOption[] = useMemo(() => {
     const anchorDate = setMilliseconds(setMinutes(setHours(value, _hourIn24h), minute), 0);
     const _min = min ? setMilliseconds(min, 0) : undefined;
     const _max = max ? setMilliseconds(max, 0) : undefined;
@@ -124,9 +138,9 @@ export function SimpleTimePicker({
 
   const [open, setOpen] = useState(false);
 
-  const hourRef = useRef < HTMLDivElement > (null);
-  const minuteRef = useRef < HTMLDivElement > (null);
-  const secondRef = useRef < HTMLDivElement > (null);
+  const hourRef = useRef<HTMLDivElement>(null);
+  const minuteRef = useRef<HTMLDivElement>(null);
+  const secondRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -140,7 +154,7 @@ export function SimpleTimePicker({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
   const onHourChange = useCallback(
-    (v) => {
+    (v: SimpleTimeOption) => {
       if (min) {
         let newTime = buildTime({ use12HourFormat, value, formatStr, hour: v.value, minute, second, ampm });
         if (newTime < min) {
@@ -161,7 +175,7 @@ export function SimpleTimePicker({
   );
 
   const onMinuteChange = useCallback(
-    (v) => {
+    (v: SimpleTimeOption) => {
       if (min) {
         let newTime = buildTime({ use12HourFormat, value, formatStr, hour: v.value, minute, second, ampm });
         if (newTime < min) {
@@ -180,7 +194,7 @@ export function SimpleTimePicker({
   );
 
   const onAmpmChange = useCallback(
-    (v) => {
+    (v: SimpleTimeOption) => {
       if (min) {
         let newTime = buildTime({ use12HourFormat, value, formatStr, hour, minute, second, ampm: v.value });
         if (newTime < min) {
@@ -302,6 +316,12 @@ const TimeItem = ({
   onSelect,
   className,
   disabled,
+}: {
+  option: SimpleTimeOption;
+  selected: boolean;
+  onSelect: (option: SimpleTimeOption) => void;
+  className?: string;
+  disabled?: boolean;
 }) => {
   return (
     <Button
@@ -316,9 +336,19 @@ const TimeItem = ({
   );
 };
 
-function buildTime(options) {
+interface BuildTimeOptions {
+  use12HourFormat?: boolean;
+  value: Date;
+  formatStr: string;
+  hour: number;
+  minute: number;
+  second: number;
+  ampm: number;
+}
+
+function buildTime(options: BuildTimeOptions) {
   const { use12HourFormat, value, formatStr, hour, minute, second, ampm } = options;
-  let date;
+  let date: Date;
   if (use12HourFormat) {
     const dateStrRaw = format(value, formatStr);
     // yyyy-MM-dd hh:mm:ss.SSS a zzzz

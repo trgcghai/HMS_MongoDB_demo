@@ -1,5 +1,4 @@
 import { Button } from '@/components/ui/button'
-import { DateTimePicker } from '@/components/ui/datetime-picker'
 import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Label } from '@/components/ui/label'
 import { faPlus } from '@fortawesome/free-solid-svg-icons'
@@ -8,6 +7,7 @@ import React, { useState } from 'react'
 import ComboDoctorCreate from './createAppointment/ComboDoctorCreate'
 import { ComboPatientCreate } from './createAppointment/ComboPatientCreate'
 import { useAppContext } from '@/app/context/Context'
+import { DateTimePicker } from '@/components/ui/datetime-picker'
 
 const DialogAppointment = () => {
     const { data, doctors, appointments, setAppointments } = useAppContext()
@@ -15,12 +15,6 @@ const DialogAppointment = () => {
     const [doctorId, setDoctorId] = useState('')
     const [date, setDate] = useState('')
     const [id] = useState(Math.floor(Math.random() * 1000000 + 1))
-
-    function formatDateString(dateString) {
-        const date = new Date(dateString).toLocaleDateString('en-CA')
-        const [year, month, day] = date.split('-');
-        return `${day}/${month}/${year}`;
-    }
 
     const handleCreateAppointment = () => {
         const patient = data.find((patient) => patient._id == patientId)

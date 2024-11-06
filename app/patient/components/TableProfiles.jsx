@@ -9,22 +9,16 @@ import {
 } from "@/components/ui/table"
 import React, { useEffect, useState } from 'react'
 import DialogUpdateProfile from "./DialogUpdateProfile";
+import { useParams } from "next/navigation";
 
 const TableProfiles = () => {
-    const { data, selectPatientID, setSelectedProfileID } = useAppContext()
-    const [listProfile, setListProfile] = useState([])
+    const params = useParams()
+    const { patients, setSelectedProfileID, formatDateString,  subProfiles, setSubProfiles } = useAppContext()
+    const [patient, setPatient] = useState(patients.find((patient) => patient._id == params.id))
 
     useEffect(() => {
-        const patient = data.find((patient) => patient._id == selectPatientID)
-        setListProfile(patient.Profiles)
-    }, [data, selectPatientID])
-
-    function formatDateString(dateString) {
-        const date = new Date(dateString).toLocaleDateString('en-CA')
-        const [year, month, day] = date.split('-');
-        return `${day}/${month}/${year}`;
-    }
-
+        setSubProfiles(patient.Profiles)
+    }, [patient])
 
     return (
         <Table>
@@ -37,15 +31,14 @@ const TableProfiles = () => {
                 </TableRow>
             </TableHeader>
             <TableBody>
-                {listProfile && listProfile.map((profile) => {
-                    console.log(profile.disease)
+                {subProfiles && subProfiles.map((profile) => {
                     return (
                         <TableRow key={profile.profile_id}>
                             <TableCell className="text-lg text-slate-600">{profile.treatment}</TableCell>
                             <TableCell className="text-lg text-slate-600">{profile.disease.join(', ')}</TableCell>
                             <TableCell className="text-lg text-slate-600">{formatDateString(profile.date)}</TableCell>
                             <TableCell className="text-lg text-slate-600" onClick={() => setSelectedProfileID(profile.profile_id)}>
-                                <DialogUpdateProfile></DialogUpdateProfile>
+                                <DialogUpdateProfile profile={profile} ></DialogUpdateProfile>
                             </TableCell>
                         </TableRow>
                     )

@@ -9,60 +9,72 @@ import { useFormContext } from 'react-hook-form';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { TZDate } from 'react-day-picker';
 
+type DateTimeInputProps = {
+  className?: string;
+  value?: Date;
+  onChange?: (date?: Date) => void;
+  format?: string;
+  disabled?: boolean;
+  clearable?: boolean;
+  timezone?: string;
+  hideCalendarIcon?: boolean;
+  onCalendarClick?: () => void;
+};
 
 // https://date-fns.org/v4.1.0/docs/format
+type SegmentType = 'year' | 'month' | 'date' | 'hour' | 'minute' | 'second' | 'period' | 'space';
 
 const segmentConfigs = [
   {
-    type: 'year',
+    type: 'year' as SegmentType,
     symbols: ['y'],
   },
   {
-    type: 'month',
+    type: 'month' as SegmentType,
     symbols: ['M'],
   },
   {
-    type: 'date',
+    type: 'date' as SegmentType,
     symbols: ['d'],
   },
   {
-    type: 'hour',
+    type: 'hour' as SegmentType,
     symbols: ['h', 'H'],
   },
   {
-    type: 'minute',
+    type: 'minute' as SegmentType,
     symbols: ['m'],
   },
   {
-    type: 'second',
+    type: 'second' as SegmentType,
     symbols: ['s'],
   },
   {
-    type: 'period',
+    type: 'period' as SegmentType,
     symbols: ['a'],
   },
   {
-    type: 'space',
+    type: 'space' as SegmentType,
     symbols: [' ', '/', '-', ':', ',', '.'],
   },
 ];
 
-const mergeRefs = (...refs) => {
-  return (node) => {
+const mergeRefs = (...refs: any) => {
+  return (node: any) => {
     for (const ref of refs) {
       if (ref) ref.current = node;
     }
   };
 };
-const DateTimeInput = React.forwardRef((options, ref) => {
+const DateTimeInput = React.forwardRef<HTMLInputElement, DateTimeInputProps>((options: DateTimeInputProps, ref) => {
   const { format: formatProp, value: _value, timezone, ...rest } = options;
   const value = useMemo(() => _value ? new TZDate(_value, timezone) : undefined, [_value, timezone]);
   const form = useFormContext();
   const formatStr = React.useMemo(() => formatProp || 'dd/MM/yyyy-hh:mm aa', [formatProp]);
-  const inputRef = useRef();
+  const inputRef = useRef<HTMLInputElement>();
 
-  const [segments, setSegments] = useState([]);
-  const [selectedSegmentAt, setSelectedSegmentAt] = useState < number | undefined > (undefined);
+  const [segments, setSegments] = useState<Segment[]>([]);
+  const [selectedSegmentAt, setSelectedSegmentAt] = useState<number | undefined>(undefined);
 
   useEffect(() => {
     if (form?.formState.isSubmitted) {
@@ -80,7 +92,7 @@ const DateTimeInput = React.forwardRef((options, ref) => {
     return segments[selectedSegmentAt];
   }, [segments, selectedSegmentAt]);
   const setCurrentSegment = useCallback(
-    (segment) => {
+    (segment: Segment | undefined) => {
       const at = segments?.findIndex((s) => s.index === segment?.index);
       at !== -1 && setSelectedSegmentAt(at);
     },
@@ -113,7 +125,7 @@ const DateTimeInput = React.forwardRef((options, ref) => {
 
 
   const onClick = useEventCallback(
-    (event) => {
+    (event: React.MouseEvent<HTMLInputElement>) => {
       event.preventDefault();
       event.stopPropagation();
       const selectionStart = inputRef.current?.selectionStart;
@@ -132,7 +144,7 @@ const DateTimeInput = React.forwardRef((options, ref) => {
   );
 
   const onSegmentChange = useEventCallback(
-    (direction) => {
+    (direction: 'left' | 'right') => {
       if (!curSegment) return;
       const validSegments = segments.filter((s) => s.type !== 'space');
       const segment =
@@ -148,7 +160,7 @@ const DateTimeInput = React.forwardRef((options, ref) => {
   );
 
   const onSegmentNumberValueChange = useEventCallback(
-    (num) => {
+    (num: string) => {
       if (!curSegment) return;
       let segment = curSegment;
       let shouldNext = false;
@@ -163,7 +175,7 @@ const DateTimeInput = React.forwardRef((options, ref) => {
         }
         const updatedSegments = segments.map((s) => (s.index === segment.index ? { ...segment, value: newValue } : s));
         setSegments(updatedSegments);
-        segment = updatedSegments.find((s) => s.index === segment.index);
+        segment = updatedSegments.find((s) => s.index === segment.index)!;
         shouldNext = newValue.length === length;
         if (!shouldNext) {
           switch (segment.type) {
@@ -191,7 +203,7 @@ const DateTimeInput = React.forwardRef((options, ref) => {
   );
 
   const onSegmentPeriodValueChange = useEventCallback(
-    (key) => {
+    (key: string) => {
       if (curSegment?.type !== 'period') return;
       let segment = curSegment;
       let ok = false;
@@ -206,7 +218,7 @@ const DateTimeInput = React.forwardRef((options, ref) => {
       if (ok) {
         const updatedSegments = segments.map((s) => (s.index === segment.index ? { ...segment, value: newValue } : s));
         setSegments(updatedSegments);
-        segment = updatedSegments.find((s) => s.index === segment.index);
+        segment = updatedSegments.find((s) => s.index === segment.index)!;
       }
       setSelection(inputRef, segment);
     },
@@ -218,14 +230,14 @@ const DateTimeInput = React.forwardRef((options, ref) => {
     if (curSegment.value) {
       const updatedSegments = segments.map((s) => (s.index === curSegment.index ? { ...curSegment, value: '' } : s));
       setSegments(updatedSegments);
-      const segment = updatedSegments.find((s) => s.index === curSegment.index);
+      const segment = updatedSegments.find((s) => s.index === curSegment.index)!;
       setSelection(inputRef, segment);
     } else {
       onSegmentChange('left');
     }
   }, [segments, curSegment]);
 
-  const onKeyDown = useEventCallback((event) => {
+  const onKeyDown = useEventCallback((event: React.KeyboardEvent<HTMLInputElement>) => {
     const key = event.key;
     setSelection(inputRef, curSegment);
 
@@ -281,7 +293,7 @@ const DateTimeInput = React.forwardRef((options, ref) => {
         onKeyDown={onKeyDown}
         value={inputStr}
         placeholder={formatStr}
-        onChange={() => { }}
+        onChange={() => {}}
         disabled={options.disabled}
         spellCheck={false}
       />
@@ -311,14 +323,20 @@ DateTimeInput.displayName = 'DateTimeInput';
 
 export { DateTimeInput };
 
-function parseFormat(formatStr, value) {
-  const views = [];
-  let lastPattern = '';
+interface Segment {
+  type: SegmentType;
+  symbols: string;
+  index: number;
+  value: string;
+}
+function parseFormat(formatStr: string, value?: Date) {
+  const views: Segment[] = [];
+  let lastPattern: any = '';
   let symbols = '';
   let patternIndex = 0;
   let index = 0;
   for (const c of formatStr) {
-    const pattern = segmentConfigs.find((p) => p.symbols.includes(c));
+    const pattern = segmentConfigs.find((p) => p.symbols.includes(c))!;
     if (!pattern) continue;
     if (pattern.type !== lastPattern) {
       symbols &&
@@ -346,18 +364,18 @@ function parseFormat(formatStr, value) {
   return views;
 }
 
-const safeDate = (timezone) => {
+const safeDate = (timezone?: string) => {
   return new TZDate('2000-01-01T00:00:00', timezone);
 };
 
 const isAndroid = () => /Android/i.test(navigator.userAgent);
 
-function setSelection(ref, segment) {
+function setSelection(ref: React.MutableRefObject<HTMLInputElement | undefined>, segment?: Segment) {
   if (!ref.current || !segment) return;
   safeSetSelection(ref.current, segment.index, segment.index + segment.symbols.length);
 }
 
-function safeSetSelection(element, selectionStart, selectionEnd) {
+function safeSetSelection(element: HTMLInputElement, selectionStart: number, selectionEnd: number) {
   requestAnimationFrame(() => {
     if (document.activeElement === element) {
       if (isAndroid()) {
@@ -370,12 +388,12 @@ function safeSetSelection(element, selectionStart, selectionEnd) {
     }
   });
 }
-export function useEventCallback(fn, deps) {
+export function useEventCallback<T extends Function>(fn: T, deps: any[]) {
   const ref = useRef(fn);
   useIsomorphicLayoutEffect(() => {
     ref.current = fn;
   });
-  return useCallback((...args) => {
+  return useCallback((...args: any[]) => {
     return ref.current?.(...args);
   }, deps);
 }

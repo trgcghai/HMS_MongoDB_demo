@@ -7,21 +7,15 @@ import DialogProfile from '../components/DialogProfile'
 
 const Page = () => {
     const param = useParams()
-    const { data } = useAppContext()
+    const { patients, formatDateString } = useAppContext()
     const [patient, setPatient] = useState()
 
     useEffect(() => {
-        setPatient(data.find((patient) => patient._id == param.id))
+        setPatient(patients.find((patient) => patient._id == param.id))
     }, [])
 
-    function formatDateString(dateString) {
-        const date = new Date(dateString).toLocaleDateString('en-CA')
-        const [year, month, day] = date.split('-');
-        return `${day}/${month}/${year}`;
-    }
-
     return (
-        <>
+        <div className='text-lg text-blue-500 ml-[200px] mt-8 px-4'>
             {patient ?
                 <div className='mb-4 px-2'>
                     <p className='text-slate-700 text-2xl font-bold'>Thông tin bệnh nhân</p>
@@ -42,7 +36,7 @@ const Page = () => {
             <p className='px-2 text-2xl font-bold text-slate-700'>Các hồ sơ bệnh nhân</p>
             <DialogProfile></DialogProfile>
             <TableProfiles></TableProfiles>
-        </>
+        </div>
     )
 }
 
