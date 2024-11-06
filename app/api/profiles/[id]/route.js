@@ -15,14 +15,10 @@ export async function POST(request) {
     const resultUpdateMain = await patientProfileCollection.updateOne({ _id: objectId._id }, {
         $set: {
             treatment: updateProfile.treatment,
-            disease: updateProfile.disease
+            disease: updateProfile.disease,
+            prescriptions: updateProfile.prescriptions
         }
     });
-
-    console.log(
-        patient._id, objectId._id, updateProfile.treatment,updateProfile.disease
-    )
-
     const resultUpdateSub = await patientCollection.updateOne({_id: patient._id, "Profiles.profile_id": objectId._id}, {
         $set: {
             "Profiles.$.treatment": updateProfile.treatment,
@@ -30,8 +26,7 @@ export async function POST(request) {
             }
         });
 
-    const foundPatient = await patientCollection.find({_id: patient._id}).toArray();
-    let subProfiles = foundPatient[0].Profiles    
+    const allProfiles = await patientProfileCollection.find({"patient.patient_id": patient._id}).toArray();
 
-    return Response.json({ updateSuccess: true, subProfiles, resultUpdateMain, resultUpdateSub});
+    return Response.json({ updateSuccess: true, allProfiles, resultUpdateMain, resultUpdateSub});
 }

@@ -72,30 +72,30 @@ const DialogPatient = () => {
                 </DialogHeader>
                 <div>
                     <div className="mb-4">
-                        <Label htmlFor="firstName">Họ</Label>
+                        <Label className="text-lg" htmlFor="firstName">Họ</Label>
                         <Input id='firstName' value={patient.firstName} onChange={(e) => { setPatient({ ...patient, firstName: e.target.value }) }} />
                     </div>
                     <div className="mb-4">
-                        <Label htmlFor="lastName">Tên</Label>
+                        <Label className="text-lg" htmlFor="lastName">Tên</Label>
                         <Input id='lastName' value={patient.lastName} onChange={(e) => { setPatient({ ...patient, lastName: e.target.value }) }} />
                     </div>
                     <div className="mb-4">
-                        <Label htmlFor="dob">Ngày sinh</Label>
+                        <Label className="text-lg" htmlFor="dob">Ngày sinh</Label>
                         <DateTimePicker id='dob' hideTime={true} value={patient.dob} onChange={(e) => {
                             setPatient({ ...patient, dob: e })
 
                         }} />
                     </div>
                     <div className="mb-4">
-                        <Label htmlFor="phone">Số điện thoại</Label>
+                        <Label className="text-lg" htmlFor="phone">Số điện thoại</Label>
                         <Input id='phone' value={patient.phone} onChange={(e) => { setPatient({ ...patient, phone: e.target.value }) }} />
                     </div>
                     <div className="mb-4">
-                        <Label htmlFor="gender">Giới tính</Label>
+                        <Label className="text-lg" htmlFor="gender">Giới tính</Label>
                         <Input id='gender' value={patient.gender} onChange={(e) => { setPatient({ ...patient, gender: e.target.value }) }} />
                     </div>
                     <div className="mb-4">
-                        <Label htmlFor="address">Địa chỉ</Label>
+                        <Label className="text-lg" htmlFor="address">Địa chỉ</Label>
                         <Input id='address' value={patient.address} onChange={(e) => { setPatient({ ...patient, address: e.target.value }) }} />
                     </div>
                 </div>

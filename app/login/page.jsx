@@ -33,11 +33,11 @@ const LoginPage = () => {
             <div className='p-4 border w-[400px] rounded-md'>
                 <p className='text-2xl font-bold text-slate-700 text-center mb-4'>Đăng nhập</p>
                 <div className='mb-4'>
-                    <Label className="text-lg mb-2">Tài khoản</Label>
+                    <Label className="text-lg" className="text-lg mb-2">Tài khoản</Label>
                     <Input value={accountId} onChange={(e) => { setAccountId(e.target.value) }} />
                 </div>
                 <div className='mb-8'>
-                    <Label className="text-lg mb-2">Mật khẩu</Label>
+                    <Label className="text-lg" className="text-lg mb-2">Mật khẩu</Label>
                     <Input type="password" value={password} onChange={(e) => { setPassword(e.target.value) }} />
                 </div>
                 <div className=''>

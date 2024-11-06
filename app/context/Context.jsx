@@ -1,17 +1,22 @@
 'use client'
 import React, { createContext, useContext, useState } from 'react'
-import { patients as patientsData, doctor, appointment } from '../data'
 
 const AppContext = createContext()
 
 const Context = ({ children }) => {
-    const [patients, setPatients] = useState(patientsData)
-    const [doctors, setDoctors] = useState(doctor)
-    const [appointments, setAppointments] = useState(appointment)
+    const [patients, setPatients] = useState([])
+    const [doctors, setDoctors] = useState([])
+    const [appointments, setAppointments] = useState([])
     const [subProfiles, setSubProfiles] = useState([])
     const [selectedProfileID, setSelectedProfileID] = useState('')
     const [selectedSearchPatientId, setSelectedSearchPatientId] = useState('')
     const [selectedSearchDoctorId, setSelectedSearchDoctorId] = useState('')
+    const [allProfiles, setAllProfiles] = useState([])
+    const [medicines, setMedicines] = useState([])
+    const [prescriptions, setPrescriptions] = useState([])
+    const [createPrescriptions, setCreatePrescriptions] = useState([])
+    const [updatePrescriptions, setUpdatePrescriptions] = useState([])
+
 
     function formatDateString(dateString) {
         const date = new Date(dateString).toLocaleDateString('en-CA')
@@ -28,7 +33,12 @@ const Context = ({ children }) => {
             selectedSearchDoctorId, setSelectedSearchDoctorId,
             appointments, setAppointments,
             subProfiles, setSubProfiles,
+            allProfiles, setAllProfiles,
             formatDateString,
+            medicines, setMedicines,
+            prescriptions, setPrescriptions,
+            createPrescriptions, setCreatePrescriptions,
+            updatePrescriptions, setUpdatePrescriptions,
         }}>
             {children}
         </AppContext.Provider >

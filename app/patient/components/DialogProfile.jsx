@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
     Dialog,
     DialogContent,
@@ -15,11 +15,13 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { Button } from '@/components/ui/button'
 import { useAppContext } from '@/app/context/Context';
 import { useParams } from 'next/navigation';
+import DialogPrescription from './DialogPrescription';
 
 const DialogProfile = () => {
     const { patients, setSubProfiles } = useAppContext()
     const { id } = useParams()
     const [profile, setProfile] = useState({ treatment: '', disease: '' })
+    const [displayedPrescriptions, setDisplayedPrescriptions] = useState([])
 
     const fetchCreateNewProfile = async () => {
         const respone = await fetch('http://localhost:3000/api/profiles', {
@@ -30,7 +32,8 @@ const DialogProfile = () => {
             body: JSON.stringify({
                 profile: {
                     treatment: profile.treatment,
-                    disease: profile.disease.split(',')
+                    disease: profile.disease.split(','),
+                    prescriptions: displayedPrescriptions
                 },
                 patient: patients.find((patient) => patient._id == id)
             })
@@ -42,11 +45,17 @@ const DialogProfile = () => {
     }
 
     const handleAddProfile = () => {
-        if (profile.treatment.trim().length == 0 || profile.disease.trim().length == 0) return
+        if (profile.treatment.trim().length != 0 && profile.disease.trim().length != 0) {
+            fetchCreateNewProfile()
+        }
 
         setProfile({ treatment: '', disease: '' })
-
-        fetchCreateNewProfile()
+        setDisplayedPrescriptions([])
+    }
+    
+    const handleCancel = () => {
+        setProfile({ treatment: '', disease: '' })
+        setDisplayedPrescriptions([])
     }
 
     return (
@@ -61,17 +70,28 @@ const DialogProfile = () => {
                 </DialogHeader>
                 <div>
                     <div className="mb-4">
-                        <Label htmlFor="firstName">Phương pháp điều trị</Label>
+                        <Label className="text-lg" htmlFor="firstName">Phương pháp điều trị</Label>
                         <Input id='firstName' value={profile.treatment} onChange={(e) => setProfile({ ...profile, treatment: e.target.value })} />
                     </div>
                     <div className="mb-4">
-                        <Label htmlFor="lastName">Các bệnh</Label>
+                        <Label className="text-lg" htmlFor="lastName">Các bệnh</Label>
                         <Input id='lastName' value={profile.disease} onChange={(e) => setProfile({ ...profile, disease: e.target.value })} />
+                    </div>
+                    <div className="mb-4">
+                        <div>
+                            <Label className="text-lg" htmlFor="lastName">Đơn thuốc</Label>
+                        </div>
+                        {displayedPrescriptions && displayedPrescriptions.map((prescription) => {
+                            return (
+                                <div key={prescription._id}>{prescription.medicine.name}: {prescription.dosage + ' ' + prescription.instructions}</div>
+                            )
+                        })}
+                        <DialogPrescription displayedPrescriptions={displayedPrescriptions} setDisplayedPrescriptions={setDisplayedPrescriptions}></DialogPrescription>
                     </div>
                 </div>
                 <DialogFooter>
                     <DialogClose asChild>
-                        <Button className="bg-red-400 w-[120px] hover:bg-red-500">
+                        <Button className="bg-red-400 w-[120px] hover:bg-red-500" onClick={handleCancel}>
                             Hủy
                         </Button>
                     </DialogClose>

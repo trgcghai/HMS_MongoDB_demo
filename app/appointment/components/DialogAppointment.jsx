@@ -82,18 +82,18 @@ const DialogAppointment = () => {
                 <div>
                     <div className="mb-4">
                         <div>
-                            <Label htmlFor="firstName">Bác sĩ</Label>
+                            <Label className="text-lg" htmlFor="firstName">Bác sĩ</Label>
                         </div>
                         <ComboDoctorCreate doctorId={doctorId} setDoctorId={setDoctorId}></ComboDoctorCreate>
                     </div>
                     <div className="mb-4">
                         <div>
-                            <Label htmlFor="lastName">Bệnh nhân</Label>
+                            <Label className="text-lg" htmlFor="lastName">Bệnh nhân</Label>
                         </div>
                         <ComboPatientCreate patientId={patientId} setPatientId={setPatientId}></ComboPatientCreate>
                     </div>
                     <div className="mb-4">
-                        <Label htmlFor="dob">Ngày khám</Label>
+                        <Label className="text-lg" htmlFor="dob">Ngày khám</Label>
                         <DateTimePicker id='dob' hideTime={true} value={date} onChange={setDate} />
                     </div>
                 </div>

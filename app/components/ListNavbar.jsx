@@ -30,10 +30,13 @@ const ListNavbar = () => {
                             <li className={`w-full py-3 cursor-pointer hover:bg-white hover:text-blue-400 text-center ${path.includes('appointment') ? 'bg-white text-blue-400' : ''}`}>
                                 <Link href={'/appointment'} >Lịch khám</Link>
                             </li>
+                            <li className={`w-full py-3 cursor-pointer hover:bg-white hover:text-blue-400 text-center ${path.includes('prescription') ? 'bg-white text-blue-400' : ''}`}>
+                                <Link href={'/prescription'} >Các đơn thuốc</Link>
+                            </li>
                         </ul>
 
                         <div className='p-2'>
-                            <Button className="w-full bg-white text-blue-400" onClick={() => {
+                            <Button className="w-full bg-white text-blue-400 text-lg" onClick={() => {
                                 router.push('/login')
                                 localStorage.removeItem('currentUser')
                             }}>Đăng xuất</Button>

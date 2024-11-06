@@ -15,33 +15,33 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Button } from '@/components/ui/button';
 import { useAppContext } from '@/app/context/Context';
 import { useParams } from 'next/navigation';
+import DialogPrescription from './DialogPrescription';
+import DialogUpdatePrescription from './DialogUpdatePrescription';
 
 const DialogUpdateProfile = ({ profile }) => {
     const params = useParams()
-    const { patients, setSubProfiles, selectedProfileID } = useAppContext()
+    const { patients, setAllProfiles } = useAppContext()
     const [patientFetch, setPatientFetch] = useState()
     const [inputTreatment, setInputTreatment] = useState('')
     const [inputDisease, setInputDisease] = useState('')
+    const [displayedPrescriptions, setDisplayedPrescriptions] = useState([])
 
     useEffect(() => {
         const patient = patients.find((patient) => patient._id == params.id)
-
-        setPatientFetch({
-            ...patient
-        })
+        setPatientFetch({...patient})
         setInputTreatment(profile.treatment)
         setInputDisease(profile.disease.join(', '))
+        setDisplayedPrescriptions(profile.prescriptions)
 
     }, [patients, params])
 
     const fetchUpdateProfile = async () => {
         const updateProfile = {
-            _id: profile.profile_id,
+            _id: profile._id,
             treatment: inputTreatment,
-            disease: inputDisease.split(', ')
+            disease: inputDisease.split(', '),
+            prescriptions: displayedPrescriptions
         }
-
-        console.log('>>> check updateProfile >>>', {updateProfile})
 
         const respone = await fetch('http://localhost:3000/api/profiles/' + profile.profile_id, {
             method: 'POST',
@@ -53,9 +53,9 @@ const DialogUpdateProfile = ({ profile }) => {
                 updateProfile
             })
         })
-        const { updateSuccess, subProfiles } = await respone.json()
+        const { updateSuccess, allProfiles } = await respone.json()
         if (updateSuccess) {
-            setSubProfiles(subProfiles)
+            setAllProfiles(allProfiles)
         }
     }
 
@@ -63,6 +63,12 @@ const DialogUpdateProfile = ({ profile }) => {
         if (profile.treatment.trim().length == 0 || inputDisease.trim().length == 0) return
 
         fetchUpdateProfile()
+    }
+
+    const handleCancel = () => {
+        setInputTreatment(profile.treatment)
+        setInputDisease(profile.disease.join(', '))
+        setDisplayedPrescriptions(profile.prescriptions)
     }
 
     return (
@@ -76,17 +82,32 @@ const DialogUpdateProfile = ({ profile }) => {
                 </DialogHeader>
                 <div>
                     <div className="mb-4">
-                        <Label htmlFor="treatment">Phương pháp điều trị</Label>
+                        <Label className="text-lg" htmlFor="treatment">Phương pháp điều trị</Label>
                         <Input id='treatment' value={inputTreatment} onChange={(e) => setInputTreatment(e.target.value)} />
                     </div>
                     <div className="mb-4">
-                        <Label htmlFor="disease">Các bệnh</Label>
+                        <Label className="text-lg" htmlFor="disease">Các bệnh</Label>
                         <Input id='disease' value={inputDisease} onChange={(e) => setInputDisease(e.target.value)} />
+                    </div>
+                    <div className="mb-4">
+                        <div>
+                            <Label className="text-lg" htmlFor="lastName">Đơn thuốc</Label>
+                        </div>
+                        {displayedPrescriptions && displayedPrescriptions.map((prescription) => {
+                            if (prescription) {
+                                return (
+                                    <div key={prescription._id}>{prescription.medicine.name}: {prescription.dosage + ' ' + prescription.instructions}</div>
+                                )
+                            } else {
+                                return <></>
+                            }
+                        })}
+                        <DialogUpdatePrescription displayedPrescriptions={displayedPrescriptions} setDisplayedPrescriptions={setDisplayedPrescriptions}></DialogUpdatePrescription>
                     </div>
                 </div>
                 <DialogFooter>
                     <DialogClose asChild>
-                        <Button className="bg-red-400 w-[120px] hover:bg-red-500">
+                        <Button className="bg-red-400 w-[120px] hover:bg-red-500" onClick={handleCancel}>
                             Hủy
                         </Button>
                     </DialogClose>

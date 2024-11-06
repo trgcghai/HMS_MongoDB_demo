@@ -23,7 +23,7 @@ export async function POST(request) {
         date: new Date(),
         treatment: profile.treatment,
         disease: profile.disease,
-        prescriptions: [],
+        prescriptions: profile.prescriptions,
         patient: {
             patient_id: patient._id,
             firstName: patient.firstName,
@@ -53,6 +53,7 @@ export async function POST(request) {
             }
         }
     );
+
     const foundPatient = await patientCollection.find({_id: patient._id}).toArray();
     let subProfiles = foundPatient[0].Profiles
     subProfiles = subProfiles.slice(-5)
