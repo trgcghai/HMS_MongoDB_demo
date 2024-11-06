@@ -7,7 +7,20 @@ import { useAppContext } from '@/app/context/Context'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 const FormSearchAppointment = () => {
-    const { selectedSearchPatientId, setSelectedSearchPatientId, selectedSearchDoctorId, setSelectedSearchDoctorId, appointments, setAppointments, resetAppointment } = useAppContext()
+    const { selectedSearchPatientId, setSelectedSearchPatientId, selectedSearchDoctorId, setSelectedSearchDoctorId, appointments, setAppointments } = useAppContext()
+
+    const fetchAppointments = async () => {
+        const response = await fetch("http://localhost:3000/api/appointments", {
+            method: 'GET',
+            headers: {
+                'content-type': 'application/json'
+            }
+        })
+        const res = await response.json()
+        if (res.querySuccess) {
+            setAppointments(res.appointments)
+        }
+    }
 
     const handleSearch = () => {
         if (selectedSearchDoctorId && selectedSearchPatientId) {
@@ -20,9 +33,10 @@ const FormSearchAppointment = () => {
     }
 
     const handleCancel = () => {
-        resetAppointment()
         setSelectedSearchPatientId("")
         setSelectedSearchDoctorId("")
+
+        fetchAppointments()
     }
 
     return (

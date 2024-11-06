@@ -10,20 +10,35 @@ import { useAppContext } from '@/app/context/Context'
 import { DateTimePicker } from '@/components/ui/datetime-picker'
 
 const DialogAppointment = () => {
-    const { data, doctors, appointments, setAppointments } = useAppContext()
+    const { patients, doctors, appointments, setAppointments } = useAppContext()
     const [patientId, setPatientId] = useState('')
     const [doctorId, setDoctorId] = useState('')
     const [date, setDate] = useState('')
-    const [id] = useState(Math.floor(Math.random() * 1000000 + 1))
+
+    const fetchCreateAppointment = async (appointment) => {
+        const respone = await fetch('http://localhost:3000/api/appointments', {
+            method: "POST",
+            headers: {
+                'content-type': 'application/json'
+            },
+            body: JSON.stringify({ appointment })
+        })
+        const {querySuccess, allAppointment} = await respone.json()
+        
+        if (querySuccess) {
+            setAppointments(allAppointment)
+
+            console.log(appointments)
+        }
+    }
 
     const handleCreateAppointment = () => {
-        const patient = data.find((patient) => patient._id == patientId)
+        const patient = patients.find((patient) => patient._id == patientId)
         const doc = doctors.find((doc) => doc._id == doctorId)
 
         if (!patient || !doc || !date || date.length == 0) return
 
         const newAppointment = {
-            _id: id,
             date,
             patient: {
                 patient_id: patient._id,
@@ -40,7 +55,18 @@ const DialogAppointment = () => {
                 specialize: doc.specialize
             }
         }
-        setAppointments([...appointments, newAppointment])
+
+        fetchCreateAppointment(newAppointment)
+
+        setDoctorId('')
+        setPatientId('')
+        setDate(null)
+    }
+
+    const handleCancel = () => {
+        setDoctorId('')
+        setPatientId('')
+        setDate(null)
     }
 
     return (
@@ -73,7 +99,7 @@ const DialogAppointment = () => {
                 </div>
                 <DialogFooter>
                     <DialogClose asChild>
-                        <Button className="bg-red-400 w-[120px] hover:bg-red-500">
+                        <Button className="bg-red-400 w-[120px] hover:bg-red-500" onClick={handleCancel}>
                             Hủy
                         </Button>
                     </DialogClose>

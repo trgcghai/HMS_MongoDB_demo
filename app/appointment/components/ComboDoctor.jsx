@@ -1,6 +1,5 @@
 'use client'
 import { useAppContext } from '@/app/context/Context'
-import * as React from "react"
 import { Check, ChevronsUpDown } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -17,10 +16,25 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover"
+import { useEffect, useState } from 'react'
 
 const ComboDoctor = () => {
-    const { doctors, selectedSearchDoctorId, setSelectedSearchDoctorId } = useAppContext()
-    const [open, setOpen] = React.useState(false)
+    const { doctors, setDoctors, selectedSearchDoctorId, setSelectedSearchDoctorId } = useAppContext()
+    const [open, setOpen] = useState(false)
+
+    useEffect(() => {
+        const fetchPatient = async () => {
+            const response = await fetch('http://localhost:3000/api/doctors', {
+                method: 'GET',
+                headers: {
+                    'content-type': 'application/json'
+                }
+            })
+            const res = await response.json()
+            setDoctors(res.doctors)
+        }
+        fetchPatient()
+    }, [])
 
     return (
         <Popover open={open} onOpenChange={setOpen}>

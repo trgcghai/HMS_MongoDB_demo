@@ -13,10 +13,6 @@ const Context = ({ children }) => {
     const [selectedSearchPatientId, setSelectedSearchPatientId] = useState('')
     const [selectedSearchDoctorId, setSelectedSearchDoctorId] = useState('')
 
-    const resetAppointment = () => {
-        setAppointments(appointment)
-    }
-
     function formatDateString(dateString) {
         const date = new Date(dateString).toLocaleDateString('en-CA')
         const [year, month, day] = date.split('-');
@@ -32,7 +28,6 @@ const Context = ({ children }) => {
             selectedSearchDoctorId, setSelectedSearchDoctorId,
             appointments, setAppointments,
             subProfiles, setSubProfiles,
-            resetAppointment,
             formatDateString,
         }}>
             {children}

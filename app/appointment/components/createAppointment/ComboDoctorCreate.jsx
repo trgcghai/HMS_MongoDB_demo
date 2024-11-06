@@ -19,8 +19,22 @@ import {
 } from "@/components/ui/popover"
 
 const ComboDoctorCreate = ({ doctorId, setDoctorId }) => {
-    const { doctors } = useAppContext()
+    const { doctors, setDoctors } = useAppContext()
     const [open, setOpen] = React.useState(false)
+
+    React.useEffect(() => {
+        const fetchPatient = async () => {
+            const response = await fetch('http://localhost:3000/api/doctors', {
+                method: 'GET',
+                headers: {
+                    'content-type': 'application/json'
+                }
+            })
+            const res = await response.json()
+            setDoctors(res.doctors)
+        }
+        fetchPatient()
+    }, [])
 
     return (
         <Popover open={open} onOpenChange={setOpen}>

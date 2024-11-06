@@ -20,7 +20,21 @@ import { useAppContext } from "@/app/context/Context"
 
 export function ComboPatientCreate({ patientId, setPatientId }) {
     const [open, setOpen] = React.useState(false)
-    const { data } = useAppContext()
+    const { patients, setPatients } = useAppContext()
+
+    React.useEffect(() => {
+        const fetchPatient = async () => {
+            const response = await fetch('http://localhost:3000/api/patients', {
+                method: 'GET',
+                headers: {
+                    'content-type': 'application/json'
+                }
+            })
+            const res = await response.json()
+            setPatients(res.patients)
+        }
+        fetchPatient()
+    }, [])
 
     return (
         <Popover open={open} onOpenChange={setOpen}>
@@ -32,7 +46,7 @@ export function ComboPatientCreate({ patientId, setPatientId }) {
                     className="w-[462px] text-lg text-slate-500 justify-between"
                 >
                     {patientId
-                        ? data.find((patient) => patient._id === patientId).firstName + ' ' + data.find((patient) => patient._id === patientId).lastName
+                        ? patients.find((patient) => patient._id === patientId).firstName + ' ' + patients.find((patient) => patient._id === patientId).lastName
                         : "Chọn bệnh nhân..."}
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
@@ -43,7 +57,7 @@ export function ComboPatientCreate({ patientId, setPatientId }) {
                     <CommandList>
                         <CommandEmpty className="text-lg p-2">Không tìm thấy bệnh nhân nào</CommandEmpty>
                         <CommandGroup>
-                            {data.map((patient) => (
+                            {patients.map((patient) => (
                                 <CommandItem
                                     key={patient._id}
                                     value={patient._id}

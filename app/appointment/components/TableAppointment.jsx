@@ -1,4 +1,5 @@
-import React from 'react'
+'use client'
+import React, { useEffect } from 'react'
 import {
     Table,
     TableBody,
@@ -10,13 +11,23 @@ import {
 import { useAppContext } from '@/app/context/Context';
 
 const TableAppointment = () => {
-    const { appointments } = useAppContext()
+    const { appointments, setAppointments, formatDateString } = useAppContext()
 
-    function formatDateString(dateString) {
-        const date = new Date(dateString).toLocaleDateString('en-CA')
-        const [year, month, day] = date.split('-');
-        return `${day}/${month}/${year}`;
-    }
+    useEffect(() => {
+        const fetchAppointments = async () => {
+            const response = await fetch("http://localhost:3000/api/appointments", {
+                method: 'GET',
+                headers: {
+                    'content-type': 'application/json'
+                }
+            })
+            const res = await response.json()
+            if (res.querySuccess) {
+                setAppointments(res.appointments)
+            }
+        }
+        fetchAppointments()
+    }, [])
 
     return (
         <Table>
