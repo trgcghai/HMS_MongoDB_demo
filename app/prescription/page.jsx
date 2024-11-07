@@ -1,6 +1,8 @@
 'use client'
 import React, { useEffect, useState } from 'react'
 import { useAppContext } from '../context/Context'
+import DialogMedicine from './components/DialogMedicine'
+import DialogPrescription from './components/DialogPrescription'
 
 const PrescriptionPage = () => {
     const { medicines, setMedicines, prescriptions, setPrescriptions } = useAppContext()
@@ -39,14 +41,15 @@ const PrescriptionPage = () => {
         <div className='text-lg text-blue-500 ml-[200px] mt-8 px-4'>
             <p className='px-2 text-2xl font-bold text-slate-700'>Các đơn thuốc</p>
             <div className='flex items-start mt-8 gap-8'>
-                <div className='w-[300px]'>
+                <div className='w-[350px]'>
                     <p className='px-2 text-lg font-bold text-slate-700'>Tên thuốc</p>
+                    <DialogMedicine></DialogMedicine>
                     {medicines && medicines.sort((a, b) => a.name.localeCompare(b.name)).map((medicine) => {
                         return (
-                            <div 
-                            key={medicine._id} 
-                            className={`w-1/2 text-center cursor-pointer p-2 my-4 text-lg text-slate-700 border rounded-md ${selectedMedicineId == medicine._id ? 'bg-blue-400 text-white font-bold' : ''}`}
-                            onClick={() => { handleSearchPrescription(medicine._id) }}
+                            <div
+                                key={medicine._id}
+                                className={`w-2/3 text-center cursor-pointer p-2 my-4 text-lg text-slate-700 border rounded-md ${selectedMedicineId == medicine._id ? 'bg-blue-400 text-white' : ''}`}
+                                onClick={() => { handleSearchPrescription(medicine._id) }}
                             >
                                 {medicine.name}
                             </div>
@@ -55,6 +58,7 @@ const PrescriptionPage = () => {
                 </div>
                 <div>
                     <p className='px-2 text-lg font-bold text-slate-700'>Các liều lượng và hướng dẫn sử dụng</p>
+                    <DialogPrescription selectedMedicineId={selectedMedicineId} setDisplayedPrescriptions={setDisplayedPrescriptions}></DialogPrescription>
                     {displayedPrescriptions ? displayedPrescriptions.map((prescription) => {
                         return (
                             <div key={prescription._id} className='text-center cursor-pointer my-4 p-2 text-lg text-slate-700 border rounded-md'>

@@ -14,9 +14,13 @@ const DialogUpdatePrescription = ({ displayedPrescriptions, setDisplayedPrescrip
     const fetchPrescription = async () => {
         const response = await fetch('http://localhost:3000/api/prescriptions', { method: 'GET' })
         const { querySuccess, prescriptions } = await response.json()
-        
+
         if (querySuccess) {
-            setDisplayedPrescriptions([...prescriptions.filter(prescription => updatePrescriptions.includes(prescription._id))])
+            console.log({ prescriptions, updatePrescriptions, displayedPrescriptions })
+            const newDisplayedPresc = [...displayedPrescriptions, ...prescriptions.filter(prescription => updatePrescriptions.includes(prescription._id))]
+            if (updatePrescriptions.length != 0) {
+                setDisplayedPrescriptions(newDisplayedPresc)
+            }
         }
     }
 

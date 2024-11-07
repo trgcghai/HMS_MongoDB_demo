@@ -23,8 +23,6 @@ const DialogProfile = () => {
     const [profile, setProfile] = useState({ treatment: '', disease: '' })
     const [displayedPrescriptions, setDisplayedPrescriptions] = useState([])
 
-    console.log("check displayedPrescriptions >> ", { displayedPrescriptions })
-
     const fetchCreateNewProfile = async () => {
         const respone = await fetch('http://localhost:3000/api/profiles', {
             method: 'POST',

@@ -63,7 +63,7 @@ const Profiles = () => {
                                 <TableCell className="text-lg text-slate-600">{formatDateString(profile.date)}</TableCell>
                                 <TableCell className="text-lg text-slate-600">{
                                     profile.prescriptions && profile.prescriptions.length != 0 && profile.prescriptions.map((prescription) => {
-                                        return <div>{prescription.medicine.name + ' ' + prescription.dosage + ' ' + prescription.instructions}</div>
+                                        return <div key={prescription._id}>{prescription.medicine.name + ' ' + prescription.dosage + ' ' + prescription.instructions}</div>
                                     })}
                                 </TableCell>
                                 <TableCell className="text-lg text-slate-600" onClick={() => setSelectedProfileID(profile.profile_id)}>
