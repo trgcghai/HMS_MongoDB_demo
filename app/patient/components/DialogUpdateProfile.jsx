@@ -10,17 +10,16 @@ import {
 import { Label } from "@/components/ui/label";
 import { Input } from '@/components/ui/input';
 import { DialogClose } from "@radix-ui/react-dialog";
-import { faEllipsis } from '@fortawesome/free-solid-svg-icons';
+import { faEllipsis, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Button } from '@/components/ui/button';
 import { useAppContext } from '@/app/context/Context';
 import { useParams } from 'next/navigation';
-import DialogPrescription from './DialogPrescription';
 import DialogUpdatePrescription from './DialogUpdatePrescription';
 
 const DialogUpdateProfile = ({ profile }) => {
     const params = useParams()
-    const { patients, setAllProfiles } = useAppContext()
+    const { patients, setAllProfiles, setUpdatePrescriptions } = useAppContext()
     const [patientFetch, setPatientFetch] = useState()
     const [inputTreatment, setInputTreatment] = useState('')
     const [inputDisease, setInputDisease] = useState('')
@@ -28,7 +27,7 @@ const DialogUpdateProfile = ({ profile }) => {
 
     useEffect(() => {
         const patient = patients.find((patient) => patient._id == params.id)
-        setPatientFetch({...patient})
+        setPatientFetch({ ...patient })
         setInputTreatment(profile.treatment)
         setInputDisease(profile.disease.join(', '))
         setDisplayedPrescriptions(profile.prescriptions)
@@ -63,12 +62,14 @@ const DialogUpdateProfile = ({ profile }) => {
         if (profile.treatment.trim().length == 0 || inputDisease.trim().length == 0) return
 
         fetchUpdateProfile()
+        setUpdatePrescriptions([])
     }
 
     const handleCancel = () => {
         setInputTreatment(profile.treatment)
         setInputDisease(profile.disease.join(', '))
         setDisplayedPrescriptions(profile.prescriptions)
+        setUpdatePrescriptions([])
     }
 
     return (
@@ -94,13 +95,14 @@ const DialogUpdateProfile = ({ profile }) => {
                             <Label className="text-lg" htmlFor="lastName">Đơn thuốc</Label>
                         </div>
                         {displayedPrescriptions && displayedPrescriptions.map((prescription) => {
-                            if (prescription) {
-                                return (
-                                    <div key={prescription._id}>{prescription.medicine.name}: {prescription.dosage + ' ' + prescription.instructions}</div>
-                                )
-                            } else {
-                                return <></>
-                            }
+                            return (
+                                <div
+                                    key={prescription._id}
+                                    className='flex items-center justify-between bg-white border text-slate-700 border-slate-700 my-3 text-md w-full py-1 px-2 rounded-md'
+                                >
+                                    {prescription.medicine.name}: {prescription.dosage + ' ' + prescription.instructions}
+                                </div>
+                            )
                         })}
                         <DialogUpdatePrescription displayedPrescriptions={displayedPrescriptions} setDisplayedPrescriptions={setDisplayedPrescriptions}></DialogUpdatePrescription>
                     </div>

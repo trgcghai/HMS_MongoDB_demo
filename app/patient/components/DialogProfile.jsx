@@ -18,10 +18,12 @@ import { useParams } from 'next/navigation';
 import DialogPrescription from './DialogPrescription';
 
 const DialogProfile = () => {
-    const { patients, setSubProfiles } = useAppContext()
+    const { patients, setSubProfiles, setCreatePrescriptions } = useAppContext()
     const { id } = useParams()
     const [profile, setProfile] = useState({ treatment: '', disease: '' })
     const [displayedPrescriptions, setDisplayedPrescriptions] = useState([])
+
+    console.log("check displayedPrescriptions >> ", { displayedPrescriptions })
 
     const fetchCreateNewProfile = async () => {
         const respone = await fetch('http://localhost:3000/api/profiles', {
@@ -38,7 +40,7 @@ const DialogProfile = () => {
                 patient: patients.find((patient) => patient._id == id)
             })
         })
-        const {createSuccess, subProfiles} = await respone.json()
+        const { createSuccess, subProfiles } = await respone.json()
         if (createSuccess) {
             setSubProfiles(subProfiles)
         }
@@ -51,11 +53,13 @@ const DialogProfile = () => {
 
         setProfile({ treatment: '', disease: '' })
         setDisplayedPrescriptions([])
+        setCreatePrescriptions([])
     }
-    
+
     const handleCancel = () => {
         setProfile({ treatment: '', disease: '' })
         setDisplayedPrescriptions([])
+        setCreatePrescriptions([])
     }
 
     return (
@@ -83,7 +87,12 @@ const DialogProfile = () => {
                         </div>
                         {displayedPrescriptions && displayedPrescriptions.map((prescription) => {
                             return (
-                                <div key={prescription._id}>{prescription.medicine.name}: {prescription.dosage + ' ' + prescription.instructions}</div>
+                                <div
+                                    key={prescription._id}
+                                    className='bg-white border text-slate-700 border-slate-700 my-3 text-md w-full py-1 px-2 rounded-md'
+                                >
+                                    {prescription.medicine.name}: {prescription.dosage + ' ' + prescription.instructions}
+                                </div>
                             )
                         })}
                         <DialogPrescription displayedPrescriptions={displayedPrescriptions} setDisplayedPrescriptions={setDisplayedPrescriptions}></DialogPrescription>

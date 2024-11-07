@@ -16,7 +16,7 @@ const DialogUpdatePrescription = ({ displayedPrescriptions, setDisplayedPrescrip
         const { querySuccess, prescriptions } = await response.json()
         
         if (querySuccess) {
-            setDisplayedPrescriptions([...displayedPrescriptions, ...prescriptions.filter(prescription => updatePrescriptions.includes(prescription._id))])
+            setDisplayedPrescriptions([...prescriptions.filter(prescription => updatePrescriptions.includes(prescription._id))])
         }
     }
 
